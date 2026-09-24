@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Happy Anniversary, My Love ♡ | Our Photobooth</title>
+  <meta name="description" content="A cute, interactive Korean-style anniversary photobooth web app made with love.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Sacramento&family=Patrick+Hand&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-pink: #ff758f;
+      --soft-pink: #ffccd5;
+      --bg-pink: #fff0f3;
+      --deep-rose: #c9184a;
+      --accent-red: #ff4d6d;
+      --warm-cream: #fffdfa;
+      --cream-card: #fdf6ee;
+      --dark-wine: #590d22;
+      --text-main: #4a3b40;
+      --text-muted: #8c7078;
+      --shadow-soft: 0 10px 30px rgba(201, 24, 74, 0.12);
+      --shadow-glow: 0 0 25px rgba(255, 117, 143, 0.4);
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-pink);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Floating Hearts Canvas */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Container & Screens */
+    .app-container {
+      width: 100%;
+      max-width: 520px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .screen {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Typography */
+    .title-handwritten {
+      font-family: 'Sacramento', cursive;
+      font-size: 3.2rem;
+      color: var(--deep-rose);
+      text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8);
+      line-height: 1.1;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .title-cute {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 2.2rem;
+      color: var(--deep-rose);
+      text-align: center;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+
+    /* Decorative Cards */
+    .card-glass {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-soft);
+      width: 100%;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #ff758f 0%, #ff4d6d 100%);
+      border: none;
+      border-radius: 50px;
+      padding: 16px 36px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 77, 109, 0.35);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 12px 26px rgba(255, 77, 109, 0.45);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px) scale(0.97);
+    }
+
+    .btn-secondary {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--deep-rose);
+      background: #fff;
+      border: 2px solid var(--soft-pink);
+      border-radius: 50px;
+      padding: 12px 24px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-pink);
+      border-color: var(--primary-pink);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.96);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    /* Welcome Screen Special Design */
+    .welcome-graphic {
+      width: 180px;
+      height: 180px;
+      margin: 16px auto 24px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .photo-stack {
+      position: relative;
+      width: 140px;
+      height: 160px;
+    }
+
+    .polaroid-mini {
+      position: absolute;
+      width: 110px;
+      height: 135px;
+      background: white;
+      padding: 8px 8px 24px 8px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+
+    .polaroid-mini img, .polaroid-mini .placeholder-img {
+      width: 100%;
+      height: 85px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: var(--soft-pink);
+    }
+
+    .polaroid-mini:nth-child(1) {
+      transform: rotate(-10deg) translate(-15px, 0);
+      z-index: 1;
+    }
+    .polaroid-mini:nth-child(2) {
+      transform: rotate(8deg) translate(15px, -5px);
+      z-index: 2;
+      background: #fffdfa;
+    }
+    .polaroid-mini:nth-child(3) {
+      transform: rotate(-2deg) translate(0px, -15px);
+      z-index: 3;
+      border: 2px solid var(--soft-pink);
+    }
+
+    /* Camera Screen Design */
+    .camera-card {
+      padding: 20px 16px;
+    }
+
+    .prompt-badge {
+      background: linear-gradient(135deg, #fff0f3, #ffe6ea);
+      border: 1.5px solid var(--soft-pink);
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--deep-rose);
+      margin-bottom: 16px;
+      display: inline-block;
+      box-shadow: 0 4px 12px rgba(255, 117, 143, 0.15);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .camera-frame-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #1a1a1a;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 6px white, 0 12px 24px rgba(0,0,0,0.15);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video#camera-stream {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Default mirrored for front camera */
+    }
+
+    video#camera-stream.unmirrored {
+      transform: scaleX(1);
+    }
+
+    /* Flash Overlay */
+    .camera-flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    .camera-flash.flash-active {
+      animation: flashAnim 0.35s ease-out;
+    }
+
+    @keyframes flashAnim {
+      0% { opacity: 0.95; }
+      100% { opacity: 0; }
+    }
+
+    /* Countdown Overlay */
+    .countdown-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 25;
+    }
+
+    .countdown-overlay.active {
+      display: flex;
+    }
+
+    .countdown-number {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 6rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 8px 24px rgba(201, 24, 74, 0.6);
+      animation: countPop 0.8s ease-in-out infinite;
+    }
+
+    @keyframes countPop {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.25); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.9; }
+    }
+
+    /* Thumbnails Bar */
+    .thumbnails-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    .thumb-slot {
+      aspect-ratio: 4/3;
+      background: var(--bg-pink);
+      border: 2px dashed var(--soft-pink);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .thumb-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-slot.active-slot {
+      border-color: var(--deep-rose);
+      box-shadow: 0 0 10px rgba(201, 24, 74, 0.3);
+    }
+
+    /* Fallback Camera Modal */
+    .camera-error-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Review Screen Grid */
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+      margin: 16px 0 24px;
+    }
+
+    .review-item {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      background: white;
+      padding: 4px;
+      border: 2px solid white;
+    }
+
+    .review-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .btn-retake-single {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      border: none;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--deep-rose);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    /* Photobooth Strip Styles */
+    .strip-customizer-card {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .theme-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      justify-content: center;
+    }
+
+    .theme-chip {
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: white;
+      border: 2px solid var(--soft-pink);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .theme-chip.active {
+      background: var(--deep-rose);
+      color: white;
+      border-color: var(--deep-rose);
+      box-shadow: 0 4px 12px rgba(201, 24, 74, 0.3);
+    }
+
+    /* Korean Photobooth Strip View */
+    .photobooth-strip-container {
+      width: 280px;
+      background: white;
+      padding: 20px 16px 24px 16px;
+      border-radius: 8px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    /* Theme 1: Pink Love */
+    .photobooth-strip-container.theme-pink {
+      background: #ffe6ea;
+      border: 3px solid #ffccd5;
+    }
+    .theme-pink .strip-header-title {
+      font-family: 'Fredoka', sans-serif;
+      color: #c9184a;
+      font-size: 1.15rem;
+      letter-spacing: 2px;
+    }
+    .theme-pink .strip-footer-quote {
+      font-family: 'Sacramento', cursive;
+      color: #c9184a;
+      font-size: 1.6rem;
+    }
+
+    /* Theme 2: Minimal Cream */
+    .photobooth-strip-container.theme-cream {
+      background: #fdf8f5;
+      border: 1px solid #e8ded8;
+    }
+    .theme-cream .strip-header-title {
+      font-family: 'Playfair Display', serif;
+      color: #5c4d47;
+      font-size: 1.05rem;
+      letter-spacing: 3px;
+    }
+    .theme-cream .strip-footer-quote {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #5c4d47;
+      font-size: 1rem;
+    }
+
+    /* Theme 3: Red Romance */
+    .photobooth-strip-container.theme-red {
+      background: #800f2f;
+      color: white;
+    }
+    .theme-red .strip-header-title {
+      font-family: 'Sacramento', cursive;
+      color: #ffccd5;
+      font-size: 2.2rem;
+    }
+    .theme-red .strip-footer-quote {
+      font-family: 'Outfit', sans-serif;
+      color: #fff0f3;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    .theme-red .strip-date {
+      color: #ffccd5 !important;
+    }
+
+    /* Theme 4: Cute Doodle */
+    .photobooth-strip-container.theme-doodle {
+      background: #f3e8ff;
+      border: 3px dashed #d8b4fe;
+    }
+    .theme-doodle .strip-header-title {
+      font-family: 'Patrick Hand', cursive;
+      color: #7e22ce;
+      font-size: 1.6rem;
+    }
+    .theme-doodle .strip-footer-quote {
+      font-family: 'Patrick Hand', cursive;
+      color: #7e22ce;
+      font-size: 1.4rem;
+    }
+
+    .strip-header {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .strip-header-hearts {
+      font-size: 0.9rem;
+      margin-top: 2px;
+      opacity: 0.85;
+    }
+
+    .strip-photos-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .strip-photo-item {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    }
+
+    .strip-photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .strip-footer {
+      text-align: center;
+      margin-top: 18px;
+      width: 100%;
+    }
+
+    .strip-date-input {
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Message & Secret Letter Modal */
+    .anniversary-msg-box {
+      margin-top: 24px;
+      padding: 20px;
+      background: white;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft);
+      text-align: center;
+      width: 100%;
+    }
+
+    .anniversary-msg-title {
+      font-family: 'Sacramento', cursive;
+      font-size: 2rem;
+      color: var(--deep-rose);
+      margin-bottom: 8px;
+    }
+
+    .anniversary-msg-body {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    /* Secret Envelope 3D Styling */
+    .envelope-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .envelope-wrapper.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .envelope-card {
+      background: #fffdfa;
+      width: 100%;
+      max-width: 440px;
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 3px solid var(--soft-pink);
+    }
+
+    .envelope-wrapper.active .envelope-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .letter-header {
+      font-family: 'Sacramento', cursive;
+      font-size: 2.6rem;
+      color: var(--deep-rose);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .letter-content {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 1.25rem;
+      line-height: 1.6;
+      color: #4a3b40;
+      white-space: pre-line;
+      margin-bottom: 24px;
+      background: #fff0f3;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px dashed var(--soft-pink);
+    }
+
+    /* Controls & Utilities */
+    .icon-btn {
+      background: white;
+      border: 1.5px solid var(--soft-pink);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      transform: scale(1.1);
+      background: var(--bg-pink);
+    }
+
+    /* Canvas (Hidden offscreen for final rendering) */
+    #export-canvas {
+      display: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .title-handwritten { font-size: 2.7rem; }
+      .title-cute { font-size: 1.8rem; }
+      .photobooth-strip-container { width: 250px; }
+      .btn-primary { font-size: 1.1rem; padding: 14px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Hearts Background Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="app-container">
+
+    <!-- 1. WELCOME SCREEN -->
+    <section id="screen-welcome" class="screen active">
+      <div class="card-glass">
+        <h1 class="title-handwritten">Happy Anniversary, My Love ♡</h1>
+        <p class="subtitle">Let's make a little memory together.</p>
+
+        <div class="welcome-graphic">
+          <div class="photo-stack">
+            <div class="polaroid-mini">
+              <div class="placeholder-img" style="background: #ffb7c5; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem;">🌸</div>
+            </div>
+            <div class="polaroid-mini">
+              <div class="placeholder-img" style="background: #ff9ebb; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem;">✨</div>
+            </div>
+            <div class="polaroid-mini">
+              <div class="placeholder-img" style="background: #ff758f; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem;">📸</div>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-start-camera" class="btn-primary">
+          <span>Take Our Photos</span> 📸
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. CAMERA SCREEN -->
+    <section id="screen-camera" class="screen">
+      <div class="card-glass camera-card">
+        <div id="photo-prompt" class="prompt-badge">
+          Okay, give me your cutest smile ♡
+        </div>
+
+        <div class="camera-frame-wrapper">
+          <video id="camera-stream" autoplay playsinline muted></video>
+          
+          <!-- Flash effect overlay -->
+          <div id="camera-flash" class="camera-flash"></div>
+
+          <!-- Countdown overlay -->
+          <div id="countdown-overlay" class="countdown-overlay">
+            <div id="countdown-number" class="countdown-number">3</div>
+          </div>
+        </div>
+
+        <!-- Camera Controls -->
+        <div style="display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:12px;">
+          <button id="btn-flip-camera" class="icon-btn" title="Flip Camera">🔄</button>
+          <button id="btn-take-photo" class="btn-primary" style="padding: 14px 28px;">
+            <span>📸 TAKE PHOTO</span>
+          </button>
+        </div>
+
+        <!-- Fallback File Upload input (Hidden) -->
+        <input type="file" id="fallback-file-input" accept="image/*" style="display:none;" multiple>
+
+        <!-- Thumbnails Progress Bar -->
+        <div class="thumbnails-bar">
+          <div class="thumb-slot active-slot" id="thumb-0">1</div>
+          <div class="thumb-slot" id="thumb-1">2</div>
+          <div class="thumb-slot" id="thumb-2">3</div>
+          <div class="thumb-slot" id="thumb-3">4</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PHOTO REVIEW SCREEN -->
+    <section id="screen-review" class="screen">
+      <div class="card-glass">
+        <h2 class="title-cute">Look at us 🥹♡</h2>
+        <p class="subtitle">Four little moments, one big love.</p>
+
+        <div class="review-grid" id="review-grid">
+          <!-- 4 Captured Photos inserted dynamically -->
+        </div>
+
+        <div class="btn-group">
+          <button id="btn-retake-all" class="btn-secondary">🔄 Retake All</button>
+          <button id="btn-continue-strip" class="btn-primary"><span>Continue</span> ✨</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. PHOTOBOOTH STRIP & FINAL SCREEN -->
+    <section id="screen-final" class="screen">
+      <h2 class="title-cute" style="margin-bottom: 4px;">Our little memory ♡</h2>
+      <p class="subtitle" style="margin-bottom: 16px;">Pick a frame & save our photobooth strip!</p>
+
+      <div class="strip-customizer-card">
+        <!-- Theme Switcher -->
+        <div class="theme-selector">
+          <div class="theme-chip active" data-theme="pink">🌸 Pink Love</div>
+          <div class="theme-chip" data-theme="cream">🍦 Minimal Cream</div>
+          <div class="theme-chip" data-theme="red">🍷 Red Romance</div>
+          <div class="theme-chip" data-theme="doodle">🎨 Cute Doodle</div>
+        </div>
+
+        <!-- Live Photobooth Strip Preview -->
+        <div id="photobooth-strip" class="photobooth-strip-container theme-pink">
+          <div class="strip-header">
+            <div class="strip-header-title">HAPPY ANNIVERSARY</div>
+            <div class="strip-header-hearts">♡ ♡ ♡</div>
+          </div>
+
+          <div class="strip-photos-list" id="strip-photos-list">
+            <!-- 4 Photos rendered here -->
+          </div>
+
+          <div class="strip-footer">
+            <div class="strip-footer-quote">"Us, always & forever ♡"</div>
+            <input type="text" id="strip-date-text" class="strip-date-input strip-date" value="23.09.2026" title="Click to edit date">
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-group" style="margin-top: 24px;">
+          <button id="btn-save-photo" class="btn-primary"><span>💾 Save Our Photos</span></button>
+          <button id="btn-take-again" class="btn-secondary">📸 Take Again</button>
+          <button id="btn-open-letter" class="btn-secondary">💌 Read My Letter</button>
+        </div>
+
+        <!-- Personalized Message Box -->
+        <div class="anniversary-msg-box">
+          <div class="anniversary-msg-title">To My Favorite Person ♡</div>
+          <p class="anniversary-msg-body">
+            "Another year of laughing, annoying each other,
+            finding solutions together, and choosing each other.
+            I'd choose you again. Every single time."
+          </p>
+          <div style="font-family: 'Fredoka', sans-serif; font-weight: 600; color: var(--deep-rose);">
+            Happy Anniversary, Baby ♡
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 5. SECRET LOVE LETTER MODAL -->
+  <div id="envelope-modal" class="envelope-wrapper">
+    <div class="envelope-card">
+      <div class="letter-header">To My Favorite Person ♡</div>
+      <div class="letter-content">
+Hi, love ♡
+
+Thank you for being my safe place, my favorite person,
+and the one I want beside me for all the little moments.
+
+Here's to every silly photo, every random adventure,
+every disagreement we survived, and every memory
+we haven't made yet.
+
+I love you.
+Always. ♡
+      </div>
+      <div style="text-align: center;">
+        <button id="btn-close-letter" class="btn-primary" style="padding: 12px 28px;">Close Letter 💌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offscreen Canvas for exporting high-res PNG -->
+  <canvas id="export-canvas"></canvas>
+
+  <script>
+    // ==========================================
+    // APP STATE & CONSTANTS
+    // ==========================================
+    const state = {
+      currentScreen: 'welcome',
+      photos: [null, null, null, null], // Array of 4 image Data URLs
+      currentPhotoIndex: 0,
+      facingMode: 'user', // 'user' (front) or 'environment' (back)
+      activeStream: null,
+      selectedTheme: 'pink',
+      retakeIndex: null, // If retaking a specific single photo
+      countdownTimer: null,
+      isTakingPhoto: false
+    };
+
+    const PROMPTS = [
+      "Okay, give me your cutest smile ♡",
+      "Now... get a little closer 🫶",
+      "One silly one hehe",
+      "Last one... make it memorable ♡"
+    ];
+
+    // Audio synth for clicks & countdown (using Web Audio API)
+    const playAudioTone = (freq, type = 'sine', duration = 0.1) => {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        // Audio context fallback silent
+      }
+    };
+
+    // ==========================================
+    // FLOATING HEARTS CANVAS BACKGROUND
+    // ==========================================
+    const initBgCanvas = () => {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const particles = [];
+      const particleCount = 28;
+
+      class HeartParticle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * width;
+          this.y = height + 20 + Math.random() * 50;
+          this.size = Math.random() * 14 + 8;
+          this.speedY = Math.random() * 1.2 + 0.5;
+          this.speedX = Math.sin(Math.random() * Math.PI * 2) * 0.5;
+          this.opacity = Math.random() * 0.5 + 0.3;
+          this.color = ['#ff758f', '#ffccd5', '#c9184a', '#ff4d6d', '#f3e8ff'][Math.floor(Math.random() * 5)];
+          this.rotation = Math.random() * Math.PI * 2;
+          this.rotSpeed = (Math.random() - 0.5) * 0.02;
+        }
+        update() {
+          this.y -= this.speedY;
+          this.x += Math.sin(this.y * 0.01) * 0.5 + this.speedX;
+          this.rotation += this.rotSpeed;
+          if (this.y < -30) this.reset();
+        }
+        draw() {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.rotation);
+          ctx.globalAlpha = this.opacity;
+          ctx.fillStyle = this.color;
+          
+          // Draw heart path
+          const s = this.size;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.bezierCurveTo(-s / 2, -s / 2, -s, s / 3, 0, s);
+          ctx.bezierCurveTo(s, s / 3, s / 2, -s / 2, 0, 0);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      for (let i = 0; i < particleCount; i++) {
+        const p = new HeartParticle();
+        p.y = Math.random() * height; // Distribute initially
+        particles.push(p);
+      }
+
+      const animateBg = () => {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animateBg);
+      };
+      animateBg();
+    };
+
+    // ==========================================
+    // NAVIGATION & SCREEN MANAGEMENT
+    // ==========================================
+    const showScreen = (screenId) => {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(`screen-${screenId}`);
+      if (target) {
+        target.classList.add('active');
+        state.currentScreen = screenId;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // Handle camera lifecycle
+      if (screenId === 'camera') {
+        startCamera();
+      } else {
+        stopCamera();
+      }
+    };
+
+    // ==========================================
+    // CAMERA ENGINE
+    // ==========================================
+    const startCamera = async () => {
+      const videoEl = document.getElementById('camera-stream');
+      stopCamera();
+
+      try {
+        const constraints = {
+          video: {
+            facingMode: state.facingMode,
+            width: { ideal: 1280 },
+            height: { ideal: 960 }
+          },
+          audio: false
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        state.activeStream = stream;
+        videoEl.srcObject = stream;
+
+        if (state.facingMode === 'user') {
+          videoEl.classList.remove('unmirrored');
+        } else {
+          videoEl.classList.add('unmirrored');
+        }
+
+        updateCameraUI();
+      } catch (err) {
+        console.warn("Camera access failed or unavailable:", err);
+        // Prompt fallback photo upload option
+        alert("Camera permission denied or camera unavailable. You can select photos from your device!");
+        document.getElementById('fallback-file-input').click();
+      }
+    };
+
+    const stopCamera = () => {
+      if (state.activeStream) {
+        state.activeStream.getTracks().forEach(track => track.stop());
+        state.activeStream = null;
+      }
+    };
+
+    const flipCamera = () => {
+      state.facingMode = (state.facingMode === 'user') ? 'environment' : 'user';
+      startCamera();
+    };
+
+    const updateCameraUI = () => {
+      const targetIndex = (state.retakeIndex !== null) ? state.retakeIndex : state.currentPhotoIndex;
+      const promptEl = document.getElementById('photo-prompt');
+      promptEl.textContent = `Photo ${targetIndex + 1} of 4: ${PROMPTS[targetIndex]}`;
+
+      // Update thumbnail slots
+      for (let i = 0; i < 4; i++) {
+        const slot = document.getElementById(`thumb-${i}`);
+        slot.classList.remove('active-slot');
+        if (i === targetIndex) {
+          slot.classList.add('active-slot');
+        }
+        if (state.photos[i]) {
+          slot.innerHTML = `<img src="${state.photos[i]}" alt="Photo ${i+1}">`;
+        } else {
+          slot.innerHTML = `${i + 1}`;
+        }
+      }
+    };
+
+    // Trigger photo capture with 3s countdown
+    const triggerCountdownAndCapture = () => {
+      if (state.isTakingPhoto) return;
+      state.isTakingPhoto = true;
+
+      const overlay = document.getElementById('countdown-overlay');
+      const numEl = document.getElementById('countdown-number');
+      overlay.classList.add('active');
+
+      let count = 3;
+      numEl.textContent = count;
+      playAudioTone(440, 'sine', 0.15);
+
+      state.countdownTimer = setInterval(() => {
+        count--;
+        if (count > 0) {
+          numEl.textContent = count;
+          playAudioTone(440, 'sine', 0.15);
+        } else if (count === 0) {
+          numEl.textContent = "♡";
+          playAudioTone(880, 'sine', 0.25);
+        } else {
+          clearInterval(state.countdownTimer);
+          overlay.classList.remove('active');
+          capturePhotoSnapshot();
+          state.isTakingPhoto = false;
+        }
+      }, 900);
+    };
+
+    const capturePhotoSnapshot = () => {
+      const videoEl = document.getElementById('camera-stream');
+      const flashEl = document.getElementById('camera-flash');
+
+      // Trigger visual flash
+      flashEl.classList.add('flash-active');
+      setTimeout(() => flashEl.classList.remove('flash-active'), 400);
+
+      // Create snapshot canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = videoEl.videoWidth || 640;
+      canvas.height = videoEl.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+
+      // Mirror if front camera
+      if (state.facingMode === 'user') {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
+
+      ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+      const targetIdx = (state.retakeIndex !== null) ? state.retakeIndex : state.currentPhotoIndex;
+      state.photos[targetIdx] = dataUrl;
+
+      if (state.retakeIndex !== null) {
+        state.retakeIndex = null;
+        renderReviewGrid();
+        showScreen('review');
+      } else {
+        state.currentPhotoIndex++;
+        if (state.currentPhotoIndex >= 4) {
+          renderReviewGrid();
+          showScreen('review');
+        } else {
+          updateCameraUI();
+        }
+      }
+    };
+
+    // ==========================================
+    // REVIEW SCREEN ENGINE
+    // ==========================================
+    const renderReviewGrid = () => {
+      const grid = document.getElementById('review-grid');
+      grid.innerHTML = '';
+
+      state.photos.forEach((photoUrl, idx) => {
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        item.innerHTML = `
+          <img src="${photoUrl || ''}" alt="Photo ${idx + 1}">
+          <button class="btn-retake-single" data-index="${idx}">🔄 Retake</button>
+        `;
+        grid.appendChild(item);
+      });
+
+      // Bind retake single buttons
+      grid.querySelectorAll('.btn-retake-single').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-index'));
+          state.retakeIndex = idx;
+          showScreen('camera');
+        });
+      });
+    };
+
+    // ==========================================
+    // PHOTOBOOTH STRIP & THEMES
+    // ==========================================
+    const renderPhotoboothStripDOM = () => {
+      const container = document.getElementById('photobooth-strip');
+      const photosList = document.getElementById('strip-photos-list');
+
+      container.className = `photobooth-strip-container theme-${state.selectedTheme}`;
+      photosList.innerHTML = '';
+
+      state.photos.forEach((photoUrl) => {
+        const photoDiv = document.createElement('div');
+        photoDiv.className = 'strip-photo-item';
+        photoDiv.innerHTML = `<img src="${photoUrl || ''}" alt="Strip Photo">`;
+        photosList.appendChild(photoDiv);
+      });
+    };
+
+    // ==========================================
+    // HIGH-RES CANVAS EXPORT ENGINE
+    // ==========================================
+    const exportPhotoboothPNG = async () => {
+      const canvas = document.getElementById('export-canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Export canvas dimensions (Retina quality 3x resolution)
+      const width = 900;
+      const height = 2600;
+      canvas.width = width;
+      canvas.height = height;
+
+      // Theme Color Specifications
+      const themes = {
+        pink: {
+          bg: '#FFE6EA',
+          border: '#FFCCD5',
+          headerTitle: 'HAPPY ANNIVERSARY',
+          headerFont: 'bold 44px "Fredoka", sans-serif',
+          headerColor: '#C9184A',
+          heartsColor: '#FF4D6D',
+          quoteFont: '64px "Sacramento", cursive',
+          quoteColor: '#C9184A',
+          dateColor: '#8C7078'
+        },
+        cream: {
+          bg: '#FDF8F5',
+          border: '#E8DED8',
+          headerTitle: 'H A P P Y  A N N I V E R S A R Y',
+          headerFont: '600 34px "Playfair Display", serif',
+          headerColor: '#5C4D47',
+          heartsColor: '#8C7078',
+          quoteFont: 'italic 38px "Playfair Display", serif',
+          quoteColor: '#5C4D47',
+          dateColor: '#8C7078'
+        },
+        red: {
+          bg: '#800F2F',
+          border: '#A4133C',
+          headerTitle: 'Happy Anniversary',
+          headerFont: '72px "Sacramento", cursive',
+          headerColor: '#FFCCD5',
+          heartsColor: '#FF758F',
+          quoteFont: '500 36px "Outfit", sans-serif',
+          quoteColor: '#FFF0F3',
+          dateColor: '#FFCCD5'
+        },
+        doodle: {
+          bg: '#F3E8FF',
+          border: '#D8B4FE',
+          headerTitle: '✨ HAPPY ANNIVERSARY ✨',
+          headerFont: 'bold 50px "Patrick Hand", cursive',
+          headerColor: '#7E22CE',
+          heartsColor: '#A855F7',
+          quoteFont: '54px "Patrick Hand", cursive',
+          quoteColor: '#7E22CE',
+          dateColor: '#9333EA'
+        }
+      };
+
+      const t = themes[state.selectedTheme] || themes.pink;
+
+      // Fill Background
+      ctx.fillStyle = t.bg;
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw Outer Frame Border
+      ctx.strokeStyle = t.border;
+      ctx.lineWidth = 16;
+      ctx.strokeRect(8, 8, width - 16, height - 16);
+
+      // Draw Header Text
+      ctx.textAlign = 'center';
+      ctx.fillStyle = t.headerColor;
+      ctx.font = t.headerFont;
+      ctx.fillText(t.headerTitle, width / 2, 120);
+
+      ctx.fillStyle = t.heartsColor;
+      ctx.font = '32px sans-serif';
+      ctx.fillText('♡ ♡ ♡', width / 2, 170);
+
+      // Photo Layout Specs
+      const photoWidth = 760;
+      const photoHeight = 440;
+      const photoLeft = (width - photoWidth) / 2; // 70px margin
+      let startY = 220;
+      const photoGap = 32;
+
+      // Load and draw all 4 captured images synchronously
+      for (let i = 0; i < 4; i++) {
+        if (state.photos[i]) {
+          await new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              // Draw photo shadow
+              ctx.save();
+              ctx.shadowColor = 'rgba(0,0,0,0.12)';
+              ctx.shadowBlur = 20;
+              ctx.shadowOffsetY = 8;
+              
+              // Draw photo background border frame
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(photoLeft - 10, startY - 10, photoWidth + 20, photoHeight + 20);
+              ctx.restore();
+
+              // Draw image aspect-fill inside photo container
+              const imgAspect = img.width / img.height;
+              const targetAspect = photoWidth / photoHeight;
+              let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+              if (imgAspect > targetAspect) {
+                sw = img.height * targetAspect;
+                sx = (img.width - sw) / 2;
+              } else {
+                sh = img.width / targetAspect;
+                sy = (img.height - sh) / 2;
+              }
+
+              ctx.drawImage(img, sx, sy, sw, sh, photoLeft, startY, photoWidth, photoHeight);
+              resolve();
+            };
+            img.src = state.photos[i];
+          });
+        }
+        startY += photoHeight + photoGap;
+      }
+
+      // Draw Footer Quote & Date
+      const footerY = startY + 60;
+      ctx.fillStyle = t.quoteColor;
+      ctx.font = t.quoteFont;
+      ctx.fillText('"Us, always & forever ♡"', width / 2, footerY);
+
+      const dateStr = document.getElementById('strip-date-text').value || '23.09.2026';
+      ctx.fillStyle = t.dateColor;
+      ctx.font = 'bold 32px "Outfit", sans-serif';
+      ctx.fillText(dateStr, width / 2, footerY + 65);
+
+      // Draw barcode accent at bottom for authentic photobooth aesthetic
+      ctx.fillStyle = t.dateColor;
+      ctx.globalAlpha = 0.4;
+      for (let b = 0; b < 24; b++) {
+        const bw = (b % 3 === 0) ? 6 : 3;
+        ctx.fillRect(width / 2 - 120 + b * 10, footerY + 110, bw, 24);
+      }
+      ctx.globalAlpha = 1.0;
+
+      // Trigger automatic PNG download
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `Anniversary_Photobooth_${dateStr.replace(/\./g, '-')}.png`;
+      link.href = dataUrl;
+      link.click();
+    };
+
+    // ==========================================
+    // INITIALIZATION & EVENT HANDLERS
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      initBgCanvas();
+
+      // Screen Navigation Clicks
+      document.getElementById('btn-start-camera').addEventListener('click', () => {
+        state.currentPhotoIndex = 0;
+        state.photos = [null, null, null, null];
+        showScreen('camera');
+      });
+
+      document.getElementById('btn-flip-camera').addEventListener('click', flipCamera);
+
+      document.getElementById('btn-take-photo').addEventListener('click', triggerCountdownAndCapture);
+
+      // Fallback Photo Uploader for devices without active camera
+      document.getElementById('fallback-file-input').addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+
+        let loadedCount = 0;
+        files.slice(0, 4).forEach((file, idx) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            state.photos[idx] = event.target.result;
+            loadedCount++;
+            if (loadedCount === Math.min(files.length, 4)) {
+              renderReviewGrid();
+              showScreen('review');
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      // Review Screen Actions
+      document.getElementById('btn-retake-all').addEventListener('click', () => {
+        state.photos = [null, null, null, null];
+        state.currentPhotoIndex = 0;
+        state.retakeIndex = null;
+        showScreen('camera');
+      });
+
+      document.getElementById('btn-continue-strip').addEventListener('click', () => {
+        renderPhotoboothStripDOM();
+        showScreen('final');
+      });
+
+      // Frame Theme Selection
+      document.querySelectorAll('.theme-chip').forEach(chip => {
+        chip.addEventListener('click', (e) => {
+          document.querySelectorAll('.theme-chip').forEach(c => c.classList.remove('active'));
+          e.target.classList.add('active');
+          state.selectedTheme = e.target.getAttribute('data-theme');
+          renderPhotoboothStripDOM();
+        });
+      });
+
+      // Final Screen Actions
+      document.getElementById('btn-save-photo').addEventListener('click', exportPhotoboothPNG);
+
+      document.getElementById('btn-take-again').addEventListener('click', () => {
+        state.photos = [null, null, null, null];
+        state.currentPhotoIndex = 0;
+        showScreen('welcome');
+      });
+
+      // Secret Love Letter Modal Handlers
+      const envelopeModal = document.getElementById('envelope-modal');
+      document.getElementById('btn-open-letter').addEventListener('click', () => {
+        envelopeModal.classList.add('active');
+      });
+
+      document.getElementById('btn-close-letter').addEventListener('click', () => {
+        envelopeModal.classList.remove('active');
+      });
+
+      envelopeModal.addEventListener('click', (e) => {
+        if (e.target === envelopeModal) {
+          envelopeModal.classList.remove('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
